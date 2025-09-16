@@ -11,6 +11,11 @@ namespace BookstoreApplication.Migrations
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
+            migrationBuilder.RenameColumn(
+                name: "DateOfBirth",
+                table: "Authors",
+                newName: "Birthday");
+
             migrationBuilder.CreateTable(
                 name: "Awards",
                 columns: table => new
@@ -27,43 +32,55 @@ namespace BookstoreApplication.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "AuthorAward",
+                name: "AuthorsAwards",
                 columns: table => new
                 {
-                    AwardsId = table.Column<int>(type: "integer", nullable: false),
-                    WinningAuthorsId = table.Column<int>(type: "integer", nullable: false)
+                    Id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    AuthorId = table.Column<int>(type: "integer", nullable: false),
+                    AwardId = table.Column<int>(type: "integer", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_AuthorAward", x => new { x.AwardsId, x.WinningAuthorsId });
+                    table.PrimaryKey("PK_AuthorsAwards", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_AuthorAward_Authors_WinningAuthorsId",
-                        column: x => x.WinningAuthorsId,
+                        name: "FK_AuthorsAwards_Authors_AuthorId",
+                        column: x => x.AuthorId,
                         principalTable: "Authors",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_AuthorAward_Awards_AwardsId",
-                        column: x => x.AwardsId,
+                        name: "FK_AuthorsAwards_Awards_AwardId",
+                        column: x => x.AwardId,
                         principalTable: "Awards",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateIndex(
-                name: "IX_AuthorAward_WinningAuthorsId",
-                table: "AuthorAward",
-                column: "WinningAuthorsId");
+                name: "IX_AuthorsAwards_AuthorId",
+                table: "AuthorsAwards",
+                column: "AuthorId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_AuthorsAwards_AwardId",
+                table: "AuthorsAwards",
+                column: "AwardId");
         }
 
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "AuthorAward");
+                name: "AuthorsAwards");
 
             migrationBuilder.DropTable(
                 name: "Awards");
+
+            migrationBuilder.RenameColumn(
+                name: "Birthday",
+                table: "Authors",
+                newName: "DateOfBirth");
         }
     }
 }

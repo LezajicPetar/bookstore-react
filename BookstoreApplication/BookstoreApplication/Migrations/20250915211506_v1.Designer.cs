@@ -12,7 +12,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace BookstoreApplication.Migrations
 {
     [DbContext(typeof(LeafDbContext))]
-    [Migration("20250915194903_v1")]
+    [Migration("20250915211506_v1")]
     partial class v1
     {
         /// <inheritdoc />
@@ -24,21 +24,6 @@ namespace BookstoreApplication.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
-
-            modelBuilder.Entity("AuthorAward", b =>
-                {
-                    b.Property<int>("AwardsId")
-                        .HasColumnType("integer");
-
-                    b.Property<int>("WinningAuthorsId")
-                        .HasColumnType("integer");
-
-                    b.HasKey("AwardsId", "WinningAuthorsId");
-
-                    b.HasIndex("WinningAuthorsId");
-
-                    b.ToTable("AuthorAward");
-                });
 
             modelBuilder.Entity("BookstoreApplication.Models.Author", b =>
                 {
@@ -53,7 +38,8 @@ namespace BookstoreApplication.Migrations
                         .HasColumnType("text");
 
                     b.Property<DateTime>("DateOfBirth")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("Birthday");
 
                     b.Property<string>("FullName")
                         .IsRequired()
@@ -62,6 +48,29 @@ namespace BookstoreApplication.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Authors");
+                });
+
+            modelBuilder.Entity("BookstoreApplication.Models.AuthorAward", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("AuthorId")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("AwardId")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AuthorId");
+
+                    b.HasIndex("AwardId");
+
+                    b.ToTable("AuthorsAwards");
                 });
 
             modelBuilder.Entity("BookstoreApplication.Models.Award", b =>
@@ -150,19 +159,23 @@ namespace BookstoreApplication.Migrations
                     b.ToTable("Publishers");
                 });
 
-            modelBuilder.Entity("AuthorAward", b =>
+            modelBuilder.Entity("BookstoreApplication.Models.AuthorAward", b =>
                 {
-                    b.HasOne("BookstoreApplication.Models.Award", null)
+                    b.HasOne("BookstoreApplication.Models.Author", "Author")
                         .WithMany()
-                        .HasForeignKey("AwardsId")
+                        .HasForeignKey("AuthorId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("BookstoreApplication.Models.Author", null)
+                    b.HasOne("BookstoreApplication.Models.Award", "Award")
                         .WithMany()
-                        .HasForeignKey("WinningAuthorsId")
+                        .HasForeignKey("AwardId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("Author");
+
+                    b.Navigation("Award");
                 });
 
             modelBuilder.Entity("BookstoreApplication.Models.Book", b =>

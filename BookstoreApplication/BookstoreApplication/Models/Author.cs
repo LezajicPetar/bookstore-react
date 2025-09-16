@@ -7,6 +7,6 @@
         public required string Biography { get; set; }
         public DateTime DateOfBirth { get; set; }
 
-        public List<Award> Awards { get; set; }
+        public List<AuthorAward> AuthorsAwards { get; set; }
     }
 }
