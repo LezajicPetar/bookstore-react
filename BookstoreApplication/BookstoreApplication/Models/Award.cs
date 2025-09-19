@@ -9,6 +9,6 @@ namespace BookstoreApplication.Models
         public string Description { get; set; }
         public int StartYear { get; set; }
 
-        public List<AuthorAward> AuthorsAwards { get; set; }
+        public List<AuthorAward> ?AuthorsAwards { get; set; }
     }
 }

@@ -1,5 +1,6 @@
 ﻿using BookstoreApplication.Data;
 using BookstoreApplication.Models;
+using BookstoreApplication.Repository;
 using Microsoft.AspNetCore.Mvc;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
@@ -10,75 +11,53 @@ namespace BookstoreApplication.Controllers
     [ApiController]
     public class PublishersController : ControllerBase
     {
-        // GET: api/publishers
+
+        private readonly PublisherRepository _publisherRepo;
+
+        public PublishersController(PublisherRepository publisherRepo)
+        {
+            _publisherRepo = publisherRepo;
+        }
+
         [HttpGet]
-        public IActionResult GetAll()
+        public ActionResult<List<Publisher>> GetAll()
         {
-            return Ok(DataStore.Publishers);
+            return _publisherRepo.GetAll();
         }
 
-        // GET api/publishers/5
         [HttpGet("{id}")]
-        public IActionResult GetOne(int id)
+        public ActionResult<Publisher> GetById(int id)
         {
-            var publisher = DataStore.Publishers.FirstOrDefault(a => a.Id == id);
-            if (publisher == null)
-            {
-                return NotFound();
-            }
-            return Ok(publisher);
+            var publisher = _publisherRepo.GetById(id);
+
+            return publisher is null ? NotFound() : publisher;
         }
 
-        // POST api/publishers
         [HttpPost]
-        public IActionResult Post(Publisher publisher)
+        public ActionResult<Publisher> Post([FromBody] Publisher publisher)
         {
-            publisher.Id = DataStore.GetNewPublisherId();
-            DataStore.Publishers.Add(publisher);
-            return Ok(publisher);
+            return publisher is null ? BadRequest() : _publisherRepo.Create(publisher);
         }
 
-        // PUT api/publishers/5
         [HttpPut("{id}")]
-        public IActionResult Put(int id, Publisher publisher)
+        public ActionResult<Publisher> Put(int id, [FromBody] Publisher publisher)
         {
-            if (id != publisher.Id)
-            {
-                return BadRequest();
-            }
+            if (id != publisher.Id) return BadRequest();
 
-            var existingPublisher = DataStore.Publishers.FirstOrDefault(a => a.Id == id);
-            if (existingPublisher == null)
-            {
-                return NotFound();
-            }
+            var existingPublisher = _publisherRepo.GetById(id);
+            if (existingPublisher == null) return NotFound();
 
-            int index = DataStore.Publishers.IndexOf(existingPublisher);
-            if (index == -1)
-            {
-                return NotFound();
+            _publisherRepo.Update(publisher);
 
-            }
-
-            DataStore.Publishers[index] = publisher;
-            return Ok(publisher);
+            return publisher;
         }
 
-        // DELETE api/publishers/5
         [HttpDelete("{id}")]
-        public IActionResult Delete(int id)
+        public ActionResult Delete(int id)
         {
-            var publisher = DataStore.Publishers.FirstOrDefault(a => a.Id == id);
-            if (publisher == null)
-            {
-                return NotFound();
-            }
-            DataStore.Publishers.Remove(publisher);
+            var deleted = _publisherRepo.Delete(id);
 
-            // kaskadno brisanje svih knjiga obrisanog izdavača
-            DataStore.Books.RemoveAll(b => b.PublisherId == id);
-
-            return NoContent();
+            return deleted ? NoContent() : NotFound();
         }
     }
 }
