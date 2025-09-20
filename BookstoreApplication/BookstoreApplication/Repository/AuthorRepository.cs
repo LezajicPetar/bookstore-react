@@ -13,45 +13,45 @@ namespace BookstoreApplication.Repository
             _context = context;
         }
 
-        public List<Author> GetAll()
+        public async Task<List<Author>> GetAllAsync()
         {
-            return _context.Authors
+            return await _context.Authors
                 .AsNoTracking()
-                .ToList();
+                .ToListAsync();
         }
 
-        public Author? GetById(int id)
+        public async Task<Author?> GetByIdAsync(int id)
         {
-            return _context.Authors.Find(id);
+            return await _context.Authors.FindAsync(id);
         }
 
-        public Author Create(Author author)
+        public async Task<Author> CreateAsync(Author author)
         {
-            _context.Authors.Add(author);
-            _context.SaveChanges();
+            await _context.Authors.AddAsync(author);
+            await _context.SaveChangesAsync();
             return author;
         }
 
-        public Author? Update(Author author)
+        public async Task<Author?> UpdateAsync(Author author)
         {
-            var existing = _context.Authors.Find(author.Id);
+            var existing = await _context.Authors.FindAsync(author.Id);
 
             if (existing == null) return null;
 
             _context.Entry(existing).CurrentValues.SetValues(author);
-            _context.SaveChanges();
+            await _context.SaveChangesAsync();
 
             return existing;
         }
 
-        public bool Delete(int authorId)
+        public async Task<bool> DeleteAsync(int authorId)
         {
-            var existing = _context.Authors.Find(authorId);
+            var existing = await _context.Authors.FindAsync(authorId);
 
             if(existing == null) return false;
 
             _context.Authors.Remove(existing);
-            _context.SaveChanges();
+            await _context.SaveChangesAsync();
 
             return true;
         }

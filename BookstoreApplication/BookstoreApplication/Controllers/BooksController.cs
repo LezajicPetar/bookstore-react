@@ -21,59 +21,59 @@ namespace BookstoreApplication.Controllers
         }
 
         [HttpGet]
-        public ActionResult<List<Book>> GetAll()
+        public async Task<ActionResult<List<Book>>> GetAllAsync()
         {
-            return _bookRepo.GetAll();
+            return await _bookRepo.GetAllAsync();
         }
 
         [HttpGet("{id}")]
-        public ActionResult<Book> GetById(int id)
+        public async Task<ActionResult<Book>> GetByIdAsync(int id)
         {
-            var book = _bookRepo.GetById(id);
+            var book = await _bookRepo.GetByIdAsync(id);
 
             return book is null ? NotFound() : book;
         }
 
         [HttpPost]
-        public ActionResult<Book> Post(Book book)
+        public async Task<ActionResult<Book>> PostAsync(Book book)
         {
-            var author = _authorRepo.GetById(book.AuthorId);
+            var author = await _authorRepo.GetByIdAsync(book.AuthorId);
             if (author == null) return BadRequest();
 
-            var publisher = _publisherRepo.GetById(book.PublisherId);
+            var publisher = await _publisherRepo.GetByIdAsync(book.PublisherId);
             if (publisher == null) return BadRequest("PUBLISHER");
 
 
             book.Author = author;
             book.Publisher = publisher;
 
-            _bookRepo.Create(book);
+            await _bookRepo.CreateAsync(book);
             return book;
         }
 
         [HttpPut("{id}")]
-        public ActionResult<Book> Put(int id, [FromBody]Book book)
+        public async Task<ActionResult<Book>> PutAsync(int id, [FromBody]Book book)
         {
             if (id != book.Id) return BadRequest();
 
-            var author = _authorRepo.GetById(book.AuthorId);
+            var author = await _authorRepo.GetByIdAsync(book.AuthorId);
             if (author == null) return BadRequest();
 
-            var publisher = _publisherRepo.GetById(book.PublisherId);
+            var publisher = await _publisherRepo.GetByIdAsync(book.PublisherId);
             if (publisher == null) return BadRequest();
 
             book.Author = author;
             book.Publisher = publisher;
 
-            var updatedBook = _bookRepo.Update(book);
+            var updatedBook = await _bookRepo.UpdateAsync(book);
 
             return updatedBook is null ? NotFound() : updatedBook;
         }
 
         [HttpDelete("{id}")]
-        public ActionResult Delete(int id)
+        public async Task<ActionResult> DeleteAsync(int id)
         {
-            var deleted = _bookRepo.Delete(id);
+            var deleted = await _bookRepo.DeleteAsync(id);
 
             return deleted ? NoContent() : NotFound();
         }

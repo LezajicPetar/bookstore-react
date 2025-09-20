@@ -14,51 +14,51 @@ namespace BookstoreApplication.Repository
             _context = context;
         }
 
-        public List<Book> GetAll()
+        public async Task<List<Book>> GetAllAsync()
         {
-            return _context.Books
+            return await _context.Books
                 .Include(b => b.Publisher)
                 .Include(b => b.Author)
                 .AsNoTracking()
-                .ToList();
+                .ToListAsync();
         }
 
-        public Book? GetById(int id)
+        public async Task<Book?> GetByIdAsync(int id)
         {
-            return _context.Books
+            return await _context.Books
                 .Include(b => b.Publisher)
                 .Include(b => b.Author)
                 .AsNoTracking()
-                .FirstOrDefault(b => b.Id == id);
+                .FirstOrDefaultAsync(b => b.Id == id);
         }
 
-        public Book Create(Book book)
+        public async Task<Book> CreateAsync(Book book)
         {
-            _context.Books.Add(book);
-            _context.SaveChanges();
+            await _context.Books.AddAsync(book);
+            await _context.SaveChangesAsync();
             return book;
         }
 
-        public Book? Update(Book book)
+        public async Task<Book?> UpdateAsync(Book book)
         {
-            var existing = _context.Books.Find(book.Id);
+            var existing = await _context.Books.FindAsync(book.Id);
 
             if (existing == null) return null;
 
             _context.Entry(existing).CurrentValues.SetValues(book);
-            _context.SaveChanges();
+            await _context.SaveChangesAsync();
 
             return existing;
         }
 
-        public bool Delete(int bookId)
+        public async Task<bool> DeleteAsync(int bookId)
         {
-            var existing = _context.Books.Find(bookId);
+            var existing = await _context.Books.FindAsync(bookId);
 
             if (existing == null) return false;
 
             _context.Books.Remove(existing);
-            _context.SaveChanges();
+            await _context.SaveChangesAsync();
 
             return true;
         }

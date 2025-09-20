@@ -17,42 +17,39 @@ namespace BookstoreApplication.Controllers
         }
 
         [HttpGet]
-        public ActionResult<List<Author>> GetAll()
+        public async Task<ActionResult<List<Author>>> GetAllAsync()
         {
-            return _authorRepo.GetAll();
+            return await _authorRepo.GetAllAsync();
         }
 
         [HttpGet("{id}")]
-        public ActionResult<Author> GetById(int id)
+        public async Task<ActionResult<Author>> GetByIdAsync(int id)
         {
-            var author = _authorRepo.GetById(id);
+            var author = await _authorRepo.GetByIdAsync(id);
 
             return author is null ? NotFound() : author;
         }
 
         [HttpPost]
-        public ActionResult<Author> Post([FromBody]Author author)
+        public async Task<ActionResult<Author>> PostAsync([FromBody]Author author)
         {
-            return author is null ? BadRequest() : _authorRepo.Create(author);
+            return author is null ? BadRequest() : await _authorRepo.CreateAsync(author);
         }
 
         [HttpPut("{id}")]
-        public ActionResult<Author> Put(int id, [FromBody]Author author)
+        public async Task<ActionResult<Author>> PutAsync(int id, [FromBody]Author author)
         {
             if (id != author.Id) return BadRequest();
 
-            var existingAuthor = _authorRepo.GetById(id);
-            if (existingAuthor == null) return NotFound();
+            var updated = await _authorRepo.UpdateAsync(author);
 
-            _authorRepo.Update(author);
-            
-            return author;
+            return updated is null ? NotFound() : updated;
         }
 
         [HttpDelete("{id}")]
-        public ActionResult Delete(int id)
+        public async Task<ActionResult> DeleteAsync(int id)
         {
-            var deleted = _authorRepo.Delete(id);
+            var deleted = await _authorRepo.DeleteAsync(id);
 
             return deleted ? NoContent() : NotFound();
         }

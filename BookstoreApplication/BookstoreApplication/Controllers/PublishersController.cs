@@ -20,42 +20,39 @@ namespace BookstoreApplication.Controllers
         }
 
         [HttpGet]
-        public ActionResult<List<Publisher>> GetAll()
+        public async Task<ActionResult<List<Publisher>>> GetAllAsync()
         {
-            return _publisherRepo.GetAll();
+            return await _publisherRepo.GetAllAsync();
         }
 
         [HttpGet("{id}")]
-        public ActionResult<Publisher> GetById(int id)
+        public async Task<ActionResult<Publisher>> GetByIdAsync(int id)
         {
-            var publisher = _publisherRepo.GetById(id);
+            var publisher = await _publisherRepo.GetByIdAsync(id);
 
             return publisher is null ? NotFound() : publisher;
         }
 
         [HttpPost]
-        public ActionResult<Publisher> Post([FromBody] Publisher publisher)
+        public async Task<ActionResult<Publisher>> PostAsync([FromBody] Publisher publisher)
         {
-            return publisher is null ? BadRequest() : _publisherRepo.Create(publisher);
+            return publisher is null ? BadRequest() : await _publisherRepo.CreateAsync(publisher);
         }
 
         [HttpPut("{id}")]
-        public ActionResult<Publisher> Put(int id, [FromBody] Publisher publisher)
+        public async Task<ActionResult<Publisher>> PutAsync(int id, [FromBody] Publisher publisher)
         {
             if (id != publisher.Id) return BadRequest();
 
-            var existingPublisher = _publisherRepo.GetById(id);
-            if (existingPublisher == null) return NotFound();
+            var updated = await _publisherRepo.UpdateAsync(publisher);
 
-            _publisherRepo.Update(publisher);
-
-            return publisher;
+            return updated is null ? NotFound() : updated;
         }
 
         [HttpDelete("{id}")]
-        public ActionResult Delete(int id)
+        public async Task<ActionResult> DeleteAsync(int id)
         {
-            var deleted = _publisherRepo.Delete(id);
+            var deleted =await _publisherRepo.DeleteAsync(id);
 
             return deleted ? NoContent() : NotFound();
         }

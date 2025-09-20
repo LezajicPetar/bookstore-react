@@ -13,45 +13,45 @@ namespace BookstoreApplication.Repository
             _context = context;
         }
 
-        public List<Publisher> GetAll()
+        public async Task<List<Publisher>> GetAllAsync()
         {
-            return _context.Publishers
-                .AsNoTracking()
-                .ToList();
+            return await _context.Publishers
+                    .AsNoTracking()
+                    .ToListAsync();
         }
 
-        public Publisher? GetById(int id)
+        public async Task<Publisher?> GetByIdAsync(int id)
         {
-            return _context.Publishers.Find(id);
+            return await _context.Publishers.FindAsync(id);
         }
 
-        public Publisher Create(Publisher publisher)
+        public async Task<Publisher> CreateAsync(Publisher publisher)
         {
-            _context.Publishers.Add(publisher);
-            _context.SaveChanges();
+            await _context.Publishers.AddAsync(publisher);
+            await _context.SaveChangesAsync();
             return publisher;
         }
 
-        public Publisher? Update(Publisher publisher)
+        public async Task<Publisher?> UpdateAsync(Publisher publisher)
         {
-            var existing = _context.Publishers.Find(publisher.Id);
+            var existing =  await _context.Publishers.FindAsync(publisher.Id);
 
             if (existing == null) return null;
 
             _context.Entry(existing).CurrentValues.SetValues(publisher);
-            _context.SaveChanges();
+            await _context.SaveChangesAsync();
 
             return existing;
         }
 
-        public bool Delete(int publisherId)
+        public async Task<bool> DeleteAsync(int publisherId)
         {
-            var existing = _context.Publishers.Find(publisherId);
+            var existing = await _context.Publishers.FindAsync(publisherId);
 
             if (existing == null) return false;
 
             _context.Publishers.Remove(existing);
-            _context.SaveChanges();
+            await _context.SaveChangesAsync();
 
             return true;
         }
