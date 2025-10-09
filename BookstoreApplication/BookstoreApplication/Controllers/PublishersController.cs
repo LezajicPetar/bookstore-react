@@ -1,9 +1,9 @@
 ﻿using BookstoreApplication.Data;
+using BookstoreApplication.Dtos;
 using BookstoreApplication.Models;
 using BookstoreApplication.Repository;
+using BookstoreApplication.Service;
 using Microsoft.AspNetCore.Mvc;
-
-// For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
 namespace BookstoreApplication.Controllers
 {
@@ -12,47 +12,46 @@ namespace BookstoreApplication.Controllers
     public class PublishersController : ControllerBase
     {
 
-        private readonly PublisherRepository _publisherRepo;
+        private readonly PublisherService _publisherService;
 
-        public PublishersController(PublisherRepository publisherRepo)
+        public PublishersController(PublisherService publisherService)
         {
-            _publisherRepo = publisherRepo;
+            _publisherService = publisherService;
         }
 
         [HttpGet]
-        public async Task<ActionResult<List<Publisher>>> GetAllAsync()
+        public async Task<ActionResult<IEnumerable<Publisher>>> GetAllAsync()
         {
-            return await _publisherRepo.GetAllAsync();
+            var publishers = await _publisherService.GetAllAsync();
+            return Ok(publishers);
         }
 
         [HttpGet("{id}")]
         public async Task<ActionResult<Publisher>> GetByIdAsync(int id)
         {
-            var publisher = await _publisherRepo.GetByIdAsync(id);
+            var publisher = await _publisherService.GetByIdAsync(id);
 
             return publisher is null ? NotFound() : publisher;
         }
 
         [HttpPost]
-        public async Task<ActionResult<Publisher>> PostAsync([FromBody] Publisher publisher)
+        public async Task<ActionResult<Publisher>> CreateAsync([FromBody] PublisherDto dto)
         {
-            return publisher is null ? BadRequest() : await _publisherRepo.CreateAsync(publisher);
+            var publisher = await _publisherService.CreateAsync(dto);
+
+            return Ok(publisher);
         }
 
         [HttpPut("{id}")]
-        public async Task<ActionResult<Publisher>> PutAsync(int id, [FromBody] Publisher publisher)
+        public async Task<ActionResult<Publisher>> EditAsync(int id, [FromBody] PublisherDto dto)
         {
-            if (id != publisher.Id) return BadRequest();
-
-            var updated = await _publisherRepo.UpdateAsync(publisher);
-
-            return updated is null ? NotFound() : updated;
+            return await _publisherService.UpdateAsync(id, dto);
         }
 
         [HttpDelete("{id}")]
         public async Task<ActionResult> DeleteAsync(int id)
         {
-            var deleted =await _publisherRepo.DeleteAsync(id);
+            var deleted = await _publisherService.DeleteAsync(id);
 
             return deleted ? NoContent() : NotFound();
         }

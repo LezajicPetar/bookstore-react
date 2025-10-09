@@ -1,6 +1,8 @@
 ﻿using BookstoreApplication.Data;
+using BookstoreApplication.Dtos;
 using BookstoreApplication.Models;
 using BookstoreApplication.Repository;
+using BookstoreApplication.Service;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -10,48 +12,46 @@ namespace BookstoreApplication.Controllers
     [ApiController]
     public class AwardsController : ControllerBase
     {
-        private readonly AwardRepository _awardRepo;
+        private readonly AwardService _awardService;
 
-        public AwardsController(AwardRepository awardRepo)
+        public AwardsController(AwardService awardService)
         {
-            _awardRepo = awardRepo;
+            _awardService = awardService;
         }
 
         [HttpGet]
-        public ActionResult<List<Award>> GetAll()
+        public async Task<ActionResult<IEnumerable<Award>>> GetAllAsync()
         {
-            return Ok(_awardRepo.GetAll());
+            var awards = await _awardService.GetAllAsync();
+            return Ok(awards);
         }
 
         [HttpGet("{id}")]
-        public ActionResult<Award> GetById(int id)
+        public async Task<ActionResult<Award>> GetByIdAsync(int id)
         {
-            var author = _awardRepo.GetById(id);
+            var award = await _awardService.GetByIdAsync(id);
 
-            return author is null ? NotFound() : Ok(author);
+            return award is null ? NotFound() : award;
         }
 
         [HttpPost]
-        public ActionResult<Award> Post([FromBody] Award award)
+        public async Task<ActionResult<Award>> CreateAsync([FromBody] AwardDto dto)
         {
-            return award is null ? BadRequest() : Ok(_awardRepo.Create(award));
+            var award = await _awardService.CreateAsync(dto);
+
+            return Ok(award);
         }
 
-        [HttpPut]
-        public ActionResult<Award> Put(int id, [FromBody] Award award)
+        [HttpPut("{id}")]
+        public async Task<ActionResult<Award>> EditAsync(int id, [FromBody] AwardDto dto)
         {
-            if (id != award.Id) return BadRequest();
-
-            var existingAward = _awardRepo.GetById(id);
-            if (existingAward is null) return NotFound();
-
-            return Ok(_awardRepo.Update(award));
+            return await _awardService.UpdateAsync(id, dto);
         }
 
         [HttpDelete("{id}")]
-        public ActionResult Delete(int id)
+        public async Task<ActionResult> DeleteAsync(int id)
         {
-            var deleted = _awardRepo.Delete(id);
+            var deleted = await _awardService.DeleteAsync(id);
 
             return deleted ? NoContent() : NotFound();
         }

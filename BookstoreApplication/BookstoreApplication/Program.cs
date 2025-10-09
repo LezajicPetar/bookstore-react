@@ -1,5 +1,6 @@
 using BookstoreApplication.Data;
 using BookstoreApplication.Repository;
+using BookstoreApplication.Service;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -26,11 +27,13 @@ builder.Services.AddDbContext<LeafDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 builder.Services.AddScoped<AuthorRepository>();
+builder.Services.AddScoped<AuthorService>();
 builder.Services.AddScoped<AwardRepository>();
+builder.Services.AddScoped<AwardService>();
 builder.Services.AddScoped<BookRepository>();
+builder.Services.AddScoped<BookService>();
 builder.Services.AddScoped<PublisherRepository>();
-builder.Services.AddScoped<AuthorAwardRepository>();
-
+builder.Services.AddScoped<PublisherService>();
 
 var app = builder.Build();
 

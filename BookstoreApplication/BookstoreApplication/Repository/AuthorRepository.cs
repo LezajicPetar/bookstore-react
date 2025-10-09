@@ -13,7 +13,7 @@ namespace BookstoreApplication.Repository
             _context = context;
         }
 
-        public async Task<List<Author>> GetAllAsync()
+        public async Task<IEnumerable<Author>> GetAllAsync()
         {
             return await _context.Authors
                 .AsNoTracking()
@@ -32,16 +32,12 @@ namespace BookstoreApplication.Repository
             return author;
         }
 
-        public async Task<Author?> UpdateAsync(Author author)
+        public async Task<Author> UpdateAsync(Author author)
         {
-            var existing = await _context.Authors.FindAsync(author.Id);
-
-            if (existing == null) return null;
-
-            _context.Entry(existing).CurrentValues.SetValues(author);
+            _context.Authors.Update(author);
             await _context.SaveChangesAsync();
 
-            return existing;
+            return author;
         }
 
         public async Task<bool> DeleteAsync(int authorId)

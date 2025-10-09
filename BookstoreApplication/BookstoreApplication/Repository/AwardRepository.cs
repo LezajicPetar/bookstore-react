@@ -13,45 +13,41 @@ namespace BookstoreApplication.Repository
             _context = context;
         }
 
-        public List<Award> GetAll()
+        public async Task<List<Award>> GetAllAsync()
         {
-            return _context.Awards
+            return await _context.Awards
                 .AsNoTracking()
-                .ToList();
+                .ToListAsync();
         }
 
-        public Award? GetById(int id)
+        public async Task<Award?> GetByIdAsync(int id)
         {
-            return _context.Awards.Find(id);
+            return await _context.Awards.FindAsync(id);
         }
 
-        public Award Create(Award award)
+        public async Task<Award> CreateAsync(Award award)
         {
-            _context.Awards.Add(award);
-            _context.SaveChanges();
+            await _context.Awards.AddAsync(award);
+            await _context.SaveChangesAsync();
             return award;
         }
 
-        public Award? Update(Award award)
+        public async Task<Award> UpdateAsync(Award award)
         {
-            var existing = _context.Awards.Find(award.Id);
+            _context.Awards.Update(award);
+            await _context.SaveChangesAsync();
 
-            if (existing == null) return null;
-
-            _context.Entry(existing).CurrentValues.SetValues(award);
-            _context.SaveChanges();
-
-            return existing;
+            return award;
         }
 
-        public bool Delete(int awardId)
+        public async Task<bool> DeleteAsync(int awardId)
         {
-            var existing = _context.Awards.Find(awardId);
+            var existing = await _context.Awards.FindAsync(awardId);
 
             if (existing == null) return false;
 
             _context.Awards.Remove(existing);
-            _context.SaveChanges();
+            await _context.SaveChangesAsync();
 
             return true;
         }

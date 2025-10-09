@@ -32,16 +32,12 @@ namespace BookstoreApplication.Repository
             return publisher;
         }
 
-        public async Task<Publisher?> UpdateAsync(Publisher publisher)
+        public async Task<Publisher> UpdateAsync(Publisher publisher)
         {
-            var existing =  await _context.Publishers.FindAsync(publisher.Id);
-
-            if (existing == null) return null;
-
-            _context.Entry(existing).CurrentValues.SetValues(publisher);
+            _context.Publishers.Update(publisher);
             await _context.SaveChangesAsync();
 
-            return existing;
+            return publisher;
         }
 
         public async Task<bool> DeleteAsync(int publisherId)

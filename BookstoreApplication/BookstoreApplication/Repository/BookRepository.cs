@@ -39,16 +39,12 @@ namespace BookstoreApplication.Repository
             return book;
         }
 
-        public async Task<Book?> UpdateAsync(Book book)
+        public async Task<Book> UpdateAsync(int id, Book book)
         {
-            var existing = await _context.Books.FindAsync(book.Id);
-
-            if (existing == null) return null;
-
-            _context.Entry(existing).CurrentValues.SetValues(book);
+            _context.Books.Update(book);
             await _context.SaveChangesAsync();
 
-            return existing;
+            return book;
         }
 
         public async Task<bool> DeleteAsync(int bookId)
