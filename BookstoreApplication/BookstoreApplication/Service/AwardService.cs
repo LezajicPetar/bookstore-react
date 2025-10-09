@@ -4,11 +4,11 @@ using BookstoreApplication.Repository;
 
 namespace BookstoreApplication.Service
 {
-    public class AwardService
+    public class AwardService : IAwardService
     {
-        private readonly AwardRepository _awardRepo;
+        private readonly IAwardRepository _awardRepo;
 
-        public AwardService(AwardRepository awardRepo)
+        public AwardService(IAwardRepository awardRepo)
         {
             _awardRepo = awardRepo;
         }

@@ -12,9 +12,9 @@ namespace BookstoreApplication.Controllers
     [ApiController]
     public class AwardsController : ControllerBase
     {
-        private readonly AwardService _awardService;
+        private readonly IAwardService _awardService;
 
-        public AwardsController(AwardService awardService)
+        public AwardsController(IAwardService awardService)
         {
             _awardService = awardService;
         }

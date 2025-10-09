@@ -4,13 +4,13 @@ using BookstoreApplication.Repository;
 
 namespace BookstoreApplication.Service
 {
-    public class BookService
+    public class BookService : IBookService
     {
-        private readonly BookRepository _bookRepo;
-        private readonly PublisherRepository _publisherRepo;
-        private readonly AuthorRepository _authorRepo;
+        private readonly IBookRepository _bookRepo;
+        private readonly IPublisherRepository _publisherRepo;
+        private readonly IAuthorRepository _authorRepo;
 
-        public BookService(BookRepository bRepo, PublisherRepository pRepo, AuthorRepository aRepo)
+        public BookService(IBookRepository bRepo, IPublisherRepository pRepo, IAuthorRepository aRepo)
         {
             _bookRepo = bRepo;
             _publisherRepo = pRepo;
@@ -27,7 +27,7 @@ namespace BookstoreApplication.Service
             return await _bookRepo.GetByIdAsync(id);
         }
 
-        public async Task<Book?> CreateAsync(BookCreateDto dto)
+        public async Task<Book> CreateAsync(BookCreateDto dto)
         {
             var author = await _authorRepo.GetByIdAsync(dto.AuthorId)
                 ?? throw new InvalidOperationException($"Author with the ID: {dto.AuthorId} not found.");
@@ -68,7 +68,7 @@ namespace BookstoreApplication.Service
             book.Author = author;
             book.Publisher = publisher;
 
-            return await _bookRepo.UpdateAsync(id, book);
+            return await _bookRepo.UpdateAsync(book);
         }
 
         public async Task<bool> DeleteAsync(int id)

@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace BookstoreApplication.Repository
 {
-    public class PublisherRepository
+    public class PublisherRepository : IPublisherRepository
     {
         private readonly LeafDbContext _context;
 
@@ -13,7 +13,7 @@ namespace BookstoreApplication.Repository
             _context = context;
         }
 
-        public async Task<List<Publisher>> GetAllAsync()
+        public async Task<IEnumerable<Publisher>> GetAllAsync()
         {
             return await _context.Publishers
                     .AsNoTracking()

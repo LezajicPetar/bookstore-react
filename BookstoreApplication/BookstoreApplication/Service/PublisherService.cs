@@ -4,11 +4,11 @@ using BookstoreApplication.Repository;
 
 namespace BookstoreApplication.Service
 {
-    public class PublisherService
+    public class PublisherService : IPublisherService
     {
-        private readonly PublisherRepository _publisherRepo;
+        private readonly IPublisherRepository _publisherRepo;
 
-        public PublisherService(PublisherRepository publisherRepo)
+        public PublisherService(IPublisherRepository publisherRepo)
         {
             _publisherRepo = publisherRepo;
         }

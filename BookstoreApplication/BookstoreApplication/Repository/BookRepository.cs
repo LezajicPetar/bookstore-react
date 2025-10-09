@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace BookstoreApplication.Repository
 {
-    public class BookRepository
+    public class BookRepository : IBookRepository
     {
         private readonly LeafDbContext _context;
 
@@ -14,7 +14,7 @@ namespace BookstoreApplication.Repository
             _context = context;
         }
 
-        public async Task<List<Book>> GetAllAsync()
+        public async Task<IEnumerable<Book>> GetAllAsync()
         {
             return await _context.Books
                 .Include(b => b.Publisher)
@@ -39,7 +39,7 @@ namespace BookstoreApplication.Repository
             return book;
         }
 
-        public async Task<Book> UpdateAsync(int id, Book book)
+        public async Task<Book> UpdateAsync(Book book)
         {
             _context.Books.Update(book);
             await _context.SaveChangesAsync();
