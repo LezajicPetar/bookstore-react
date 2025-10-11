@@ -31,7 +31,7 @@ namespace BookstoreApplication.Controllers
         {
             var award = await _awardService.GetByIdAsync(id);
 
-            return award is null ? NotFound() : award;
+            return award is null ? NotFound() : Ok(award);
         }
 
         [HttpPost]
@@ -45,7 +45,7 @@ namespace BookstoreApplication.Controllers
         [HttpPut("{id}")]
         public async Task<ActionResult<Award>> EditAsync(int id, [FromBody] AwardDto dto)
         {
-            return await _awardService.UpdateAsync(id, dto);
+            return Ok(await _awardService.UpdateAsync(id, dto));
         }
 
         [HttpDelete("{id}")]

@@ -1,5 +1,5 @@
 ﻿using BookstoreApplication.Data;
-using BookstoreApplication.Dtos;
+using BookstoreApplication.Dtos.Book;
 using BookstoreApplication.Models;
 using BookstoreApplication.Repository;
 using BookstoreApplication.Service;
@@ -18,18 +18,18 @@ namespace BookstoreApplication.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Book>>> GetAllAsync()
+        public async Task<ActionResult<IEnumerable<BookDto>>> GetAllAsync()
         {
             var books = await _bookService.GetAllAsync();
             return Ok(books);
         }
 
         [HttpGet("{id}")]
-        public async Task<ActionResult<Book>> GetByIdAsync(int id)
+        public async Task<ActionResult<BookDetailsDto>> GetByIdAsync(int id)
         {
             var book = await _bookService.GetByIdAsync(id);
 
-            return book is null ? NotFound() : book;
+            return book is null ? NotFound() : Ok(book);
         }
 
         [HttpPost]
@@ -45,7 +45,7 @@ namespace BookstoreApplication.Controllers
         {
             var updatedBook = await _bookService.UpdateAsync(id, dto);
 
-            return updatedBook is null ? BadRequest("Author or Publisher not found.") : updatedBook;
+            return updatedBook is null ? BadRequest("Author or Publisher not found.") : Ok(updatedBook);
         }
 
         [HttpDelete("{id}")]

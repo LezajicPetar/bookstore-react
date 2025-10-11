@@ -1,4 +1,4 @@
-﻿namespace BookstoreApplication.Dtos
+﻿namespace BookstoreApplication.Dtos.Book
 {
     public class BookCreateDto
     {
