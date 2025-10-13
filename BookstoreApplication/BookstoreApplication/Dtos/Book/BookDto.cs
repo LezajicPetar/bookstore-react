@@ -1,12 +1,26 @@
-﻿namespace BookstoreApplication.Dtos.Book
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace BookstoreApplication.Dtos.Book
 {
     public class BookDto
     {
+        [Required]
+        [Range(1, int.MaxValue)]
         public int Id { get; set; }
-        public string Title { get; set; }
-        public string ISBN { get; set; }
-        public string AuthorFullName { get; set; }
-        public string PublisherName { get; set; }
+
+        [Required]
+        public string Title { get; set; } = string.Empty;
+
+        [Required]
+        public string ISBN { get; set; } = string.Empty;
+
+        [Required]
+        public string AuthorFullName { get; set; } = string.Empty;
+
+        [Required]
+        public string PublisherName { get; set; } = string.Empty;
+
+        [Required]
         public int AgeInYears { get; set; }
     }
 }

@@ -3,8 +3,8 @@
     public class Publisher
     {
         public int Id { get; set; }
-        public required string Name { get; set; }
-        public required string Address { get; set; }
-        public required string Website { get; set; }
+        public string Name { get; set; } = string.Empty;
+        public string Address { get; set; } = string.Empty;
+        public string Website { get; set; } = string.Empty;
     }
 }

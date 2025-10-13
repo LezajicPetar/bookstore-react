@@ -9,7 +9,7 @@ namespace BookstoreApplication.Service
         public Task<Publisher?> GetByIdAsync(int id);
         public Task<Publisher> CreateAsync(PublisherDto dto);
         public Task<Publisher> UpdateAsync(int id, PublisherDto dto);
-        public Task<bool> DeleteAsync(int id);
+        public Task DeleteAsync(int id);
 
     }
 }

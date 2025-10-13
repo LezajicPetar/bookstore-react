@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using BookstoreApplication.Dtos.Book;
+using BookstoreApplication.Exceptions;
 using BookstoreApplication.Models;
 using BookstoreApplication.Repository;
 
@@ -31,7 +32,8 @@ namespace BookstoreApplication.Service
 
         public async Task<BookDetailsDto?> GetByIdAsync(int id)
         {
-            var book = await _bookRepo.GetByIdAsync(id);
+            var book = await _bookRepo.GetByIdAsync(id)
+                ?? throw new NotFoundException("Book", id);
 
             return _mapper.Map<BookDetailsDto>(book);
         }
@@ -39,21 +41,14 @@ namespace BookstoreApplication.Service
         public async Task<Book> CreateAsync(BookCreateDto dto)
         {
             var author = await _authorRepo.GetByIdAsync(dto.AuthorId)
-                ?? throw new InvalidOperationException($"Author with the ID: {dto.AuthorId} not found.");
+                ?? throw new NotFoundException("Author", dto.AuthorId);
             var publisher = await _publisherRepo.GetByIdAsync(dto.PublisherId)
-                ?? throw new InvalidOperationException($"Publisher with the ID: {dto.PublisherId} not found.");
+                ?? throw new NotFoundException("Publisher", dto.PublisherId);
 
-            var book = new Book
-            {
-                Title = dto.Title,
-                PageCount = dto.PageCount,
-                PublishedDate = dto.PublishedDate,
-                ISBN = dto.ISBN,
-                AuthorId = dto.AuthorId,
-                Author = author,
-                PublisherId = dto.PublisherId,
-                Publisher = publisher
-            };
+            var book = _mapper.Map<Book>(dto);
+
+            book.Author = author;
+            book.Publisher = publisher;
 
             await _bookRepo.CreateAsync(book);
             return book;
@@ -62,27 +57,26 @@ namespace BookstoreApplication.Service
         public async Task<Book> UpdateAsync(int id, BookUpdateDto dto)
         {
             var book = await _bookRepo.GetByIdAsync(id)
-                ?? throw new KeyNotFoundException($"Book with the ID: {id} not found.");
+                ?? throw new NotFoundException("Book", id);
 
             var author = await _authorRepo.GetByIdAsync(dto.AuthorId)
-                ?? throw new InvalidOperationException($"Author with the ID: {dto.AuthorId} not found.");
+                ?? throw new NotFoundException("Author", dto.AuthorId);
 
             var publisher = await _publisherRepo.GetByIdAsync(dto.PublisherId)
-                ?? throw new InvalidOperationException($"Publisher with the ID: {dto.PublisherId} not found.");
+                ?? throw new NotFoundException("Publisher", dto.PublisherId);
 
-            book.Title = dto.Title;
-            book.PageCount = dto.PageCount;
-            book.PublishedDate = dto.PublishedDate;
-            book.ISBN = dto.ISBN;
+            _mapper.Map(dto, book);
+
             book.Author = author;
             book.Publisher = publisher;
 
             return await _bookRepo.UpdateAsync(book);
         }
 
-        public async Task<bool> DeleteAsync(int id)
+        public async Task DeleteAsync(int id)
         {
-            return await _bookRepo.DeleteAsync(id);
+            var deleted = await _bookRepo.DeleteAsync(id)
+                ?? throw new NotFoundException("Book", id);
         }
     }
 }

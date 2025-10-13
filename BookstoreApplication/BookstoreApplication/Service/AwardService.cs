@@ -1,4 +1,6 @@
-﻿using BookstoreApplication.Dtos;
+﻿using AutoMapper;
+using BookstoreApplication.Dtos;
+using BookstoreApplication.Exceptions;
 using BookstoreApplication.Models;
 using BookstoreApplication.Repository;
 
@@ -7,10 +9,12 @@ namespace BookstoreApplication.Service
     public class AwardService : IAwardService
     {
         private readonly IAwardRepository _awardRepo;
+        private readonly IMapper _mapper;
 
-        public AwardService(IAwardRepository awardRepo)
+        public AwardService(IAwardRepository awardRepo, IMapper mapper)
         {
             _awardRepo = awardRepo;
+            _mapper = mapper;
         }
 
         public async Task<IEnumerable<Award>> GetAllAsync()
@@ -20,17 +24,13 @@ namespace BookstoreApplication.Service
 
         public async Task<Award?> GetByIdAsync(int id)
         {
-            return await _awardRepo.GetByIdAsync(id);
+            return await _awardRepo.GetByIdAsync(id)
+                ?? throw new NotFoundException("Award", id);
         }
 
         public async Task<Award> CreateAsync(AwardDto dto)
         {
-            var award = new Award
-            {
-                Name = dto.Name,
-                Description = dto.Description,
-                StartYear = dto.StartYear,
-            };
+            var award = _mapper.Map<Award>(dto);
 
             return await _awardRepo.CreateAsync(award);
         }
@@ -38,18 +38,17 @@ namespace BookstoreApplication.Service
         public async Task<Award> UpdateAsync(int id, AwardDto dto)
         {
             var award = await _awardRepo.GetByIdAsync(id)
-                ?? throw new InvalidOperationException($"Award with the ID: {id} not found.");
+                ?? throw new NotFoundException("Award", id);
 
-            award.Name = dto.Name;
-            award.Description = dto.Description;
-            award.StartYear = dto.StartYear;
+            _mapper.Map(dto, award);
 
             return await _awardRepo.UpdateAsync(award);
         }
 
-        public async Task<bool> DeleteAsync(int id)
+        public async Task DeleteAsync(int id)
         {
-            return await _awardRepo.DeleteAsync(id);
+            var deleted = await _awardRepo.DeleteAsync(id)
+                ?? throw new NotFoundException("Award", id);
         }
     }
 }

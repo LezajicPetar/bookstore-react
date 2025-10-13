@@ -8,6 +8,12 @@ namespace BookstoreApplication.Profiles
     {
         public BookProfile()
         {
+            CreateMap<BookUpdateDto, Book>();
+
+            CreateMap<BookCreateDto, Book>()
+                .ForMember(dest => dest.PublishedDate,
+                    opt => opt.MapFrom(src => DateTime.SpecifyKind(src.PublishedDate, DateTimeKind.Utc)));
+
             CreateMap<Book, BookDto>()
                 .ForMember(
                 dest => dest.AuthorFullName,

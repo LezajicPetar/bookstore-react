@@ -1,10 +1,16 @@
-﻿namespace BookstoreApplication.Dtos
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace BookstoreApplication.Dtos
 {
     public class AuthorDto
     {
-        public required string FullName { get; set; }
-        public required string Biography { get; set; }
-        public DateTime DateOfBirth { get; set; }
+        [Required]
+        public string FullName { get; set; } = string.Empty;
 
+        [Required]
+        public string Biography { get; set; } = string.Empty;
+
+        [Required]
+        public DateTime DateOfBirth { get; set; }
     }
 }

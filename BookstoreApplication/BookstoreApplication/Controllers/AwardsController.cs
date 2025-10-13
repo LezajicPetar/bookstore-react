@@ -22,38 +22,43 @@ namespace BookstoreApplication.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Award>>> GetAllAsync()
         {
-            var awards = await _awardService.GetAllAsync();
-            return Ok(awards);
+            return Ok(await _awardService.GetAllAsync());
         }
 
         [HttpGet("{id}")]
         public async Task<ActionResult<Award>> GetByIdAsync(int id)
         {
-            var award = await _awardService.GetByIdAsync(id);
-
-            return award is null ? NotFound() : Ok(award);
+            return Ok(await _awardService.GetByIdAsync(id));
         }
 
         [HttpPost]
         public async Task<ActionResult<Award>> CreateAsync([FromBody] AwardDto dto)
         {
-            var award = await _awardService.CreateAsync(dto);
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
 
-            return Ok(award);
+            return Ok(await _awardService.CreateAsync(dto));
         }
 
         [HttpPut("{id}")]
         public async Task<ActionResult<Award>> EditAsync(int id, [FromBody] AwardDto dto)
         {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
             return Ok(await _awardService.UpdateAsync(id, dto));
         }
 
         [HttpDelete("{id}")]
         public async Task<ActionResult> DeleteAsync(int id)
         {
-            var deleted = await _awardService.DeleteAsync(id);
+            await _awardService.DeleteAsync(id);
 
-            return deleted ? NoContent() : NotFound();
+            return NoContent();
         }
     }
 }

@@ -22,38 +22,43 @@ namespace BookstoreApplication.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Publisher>>> GetAllAsync()
         {
-            var publishers = await _publisherService.GetAllAsync();
-            return Ok(publishers);
+            return Ok(await _publisherService.GetAllAsync());
         }
 
         [HttpGet("{id}")]
         public async Task<ActionResult<Publisher>> GetByIdAsync(int id)
         {
-            var publisher = await _publisherService.GetByIdAsync(id);
-
-            return publisher is null ? NotFound() : publisher;
+            return Ok(_publisherService.GetByIdAsync(id));
         }
 
         [HttpPost]
         public async Task<ActionResult<Publisher>> CreateAsync([FromBody] PublisherDto dto)
         {
-            var publisher = await _publisherService.CreateAsync(dto);
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
 
-            return Ok(publisher);
+            return Ok(await _publisherService.CreateAsync(dto));
         }
 
         [HttpPut("{id}")]
         public async Task<ActionResult<Publisher>> EditAsync(int id, [FromBody] PublisherDto dto)
         {
-            return await _publisherService.UpdateAsync(id, dto);
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            return Ok(await _publisherService.UpdateAsync(id, dto));
         }
 
         [HttpDelete("{id}")]
         public async Task<ActionResult> DeleteAsync(int id)
         {
-            var deleted = await _publisherService.DeleteAsync(id);
+            await _publisherService.DeleteAsync(id);
 
-            return deleted ? NoContent() : NotFound();
+            return NoContent();
         }
     }
 }

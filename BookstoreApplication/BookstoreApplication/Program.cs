@@ -1,4 +1,5 @@
 using BookstoreApplication.Data;
+using BookstoreApplication.Middleware;
 using BookstoreApplication.Models;
 using BookstoreApplication.Profiles;
 using BookstoreApplication.Repository;
@@ -37,20 +38,27 @@ builder.Services.AddScoped<IBookService, BookService>();
 builder.Services.AddScoped<IPublisherRepository, PublisherRepository>();
 builder.Services.AddScoped<IPublisherService, PublisherService>();
 
+builder.Services.AddTransient<ExceptionHandlingMiddleware>();
+
+
 builder.Services.AddAutoMapper(cfg => {
     cfg.AddProfile<BookProfile>();
+    cfg.AddProfile<AwardProfile>();
+    cfg.AddProfile<PublisherProfile>();
+    cfg.AddProfile<AuthorProfile>();
 });
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
+app.UseMiddleware<ExceptionHandlingMiddleware>();
+
+
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
 }
 
-// Aktiviraj CORS pre bilo kog mapiranja kontrolera ili autorizacije
 app.UseCors("AllowReactApp");
 
 app.UseAuthorization();

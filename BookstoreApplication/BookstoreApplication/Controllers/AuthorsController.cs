@@ -21,38 +21,43 @@ namespace BookstoreApplication.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Author>>> GetAllAsync()
         {
-            var authors = await _authorService.GetAllAsync();
-            return Ok(authors);
+            return Ok(await _authorService.GetAllAsync());
         }
 
         [HttpGet("{id}")]
         public async Task<ActionResult<Author>> GetByIdAsync(int id)
         {
-            var author = await _authorService.GetByIdAsync(id);
-
-            return author is null ? NotFound() : author;
+            return  Ok(await _authorService.GetByIdAsync(id));
         }
 
         [HttpPost]
         public async Task<ActionResult<Author>> CreateAsync([FromBody]AuthorDto dto)
         {
-            var author = await _authorService.CreateAsync(dto);
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
 
-            return Ok(author);
+            return Ok(await _authorService.CreateAsync(dto));
         }
 
         [HttpPut("{id}")]
         public async Task<ActionResult<Author>> EditAsync(int id, [FromBody] AuthorDto dto)
         {
-            return await _authorService.UpdateAsync(id, dto);
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            return Ok(await _authorService.UpdateAsync(id, dto));
         }
 
         [HttpDelete("{id}")]
         public async Task<ActionResult> DeleteAsync(int id)
         {
-            var deleted = await _authorService.DeleteAsync(id);
+            await _authorService.DeleteAsync(id);
 
-            return deleted ? NoContent() : NotFound();
+            return NoContent();
         }
     }
 }

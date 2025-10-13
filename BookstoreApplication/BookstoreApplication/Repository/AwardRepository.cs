@@ -40,16 +40,16 @@ namespace BookstoreApplication.Repository
             return award;
         }
 
-        public async Task<bool> DeleteAsync(int awardId)
+        public async Task<Award?> DeleteAsync(int awardId)
         {
             var existing = await _context.Awards.FindAsync(awardId);
 
-            if (existing == null) return false;
+            if (existing == null) return null;
 
             _context.Awards.Remove(existing);
             await _context.SaveChangesAsync();
 
-            return true;
+            return existing;
         }
     }
 }

@@ -1,4 +1,6 @@
-﻿using BookstoreApplication.Dtos;
+﻿using AutoMapper;
+using BookstoreApplication.Dtos;
+using BookstoreApplication.Exceptions;
 using BookstoreApplication.Models;
 using BookstoreApplication.Repository;
 
@@ -7,10 +9,12 @@ namespace BookstoreApplication.Service
     public class AuthorService : IAuthorService
     {
         private readonly IAuthorRepository _authorRepo;
+        private readonly IMapper _mapper;
 
-        public AuthorService(IAuthorRepository authorRepo)
+        public AuthorService(IAuthorRepository authorRepo, IMapper mapper)
         {
             _authorRepo = authorRepo;
+            _mapper = mapper;
         }
 
         public async Task<IEnumerable<Author>> GetAllAsync()
@@ -20,17 +24,13 @@ namespace BookstoreApplication.Service
 
         public async Task<Author?> GetByIdAsync(int id)
         {
-            return await _authorRepo.GetByIdAsync(id);
+            return await _authorRepo.GetByIdAsync(id)
+                ?? throw new NotFoundException("Author", id);
         }
 
         public async Task<Author> CreateAsync(AuthorDto dto)
         {
-            var author = new Author
-            {
-                FullName = dto.FullName,
-                Biography = dto.Biography,
-                DateOfBirth = dto.DateOfBirth,
-            };
+            var author = _mapper.Map<Author>(dto);
 
             return await _authorRepo.CreateAsync(author);
         }
@@ -38,18 +38,17 @@ namespace BookstoreApplication.Service
         public async Task<Author> UpdateAsync(int id, AuthorDto dto)
         {
             var author = await _authorRepo.GetByIdAsync(id)
-                ?? throw new InvalidOperationException($"Author with the ID: {id} not found.");
+                ?? throw new NotFoundException("Author", id);
 
-            author.FullName = dto.FullName;
-            author.Biography = dto.Biography;
-            author.DateOfBirth = dto.DateOfBirth;
+            _mapper.Map(dto, author);
 
             return await _authorRepo.UpdateAsync(author);
         }
 
-        public async Task<bool> DeleteAsync(int id)
+        public async Task DeleteAsync(int id)
         {
-            return await _authorRepo.DeleteAsync(id);
+            var deleted = await _authorRepo.DeleteAsync(id)
+                ?? throw new NotFoundException("Author", id);
         }
     }
 }
