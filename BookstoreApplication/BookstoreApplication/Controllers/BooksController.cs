@@ -12,21 +12,36 @@ namespace BookstoreApplication.Controllers
     public class BooksController : ControllerBase
     {
         private readonly IBookService _bookService;
-        public BooksController(IBookService bookService)
+        private readonly ILogger<BooksController> _logger;
+
+        public BooksController(IBookService bookService, ILogger<BooksController> logger)
         {
             _bookService = bookService;
+            _logger = logger;
         }
 
         [HttpGet]
         public async Task<ActionResult<IEnumerable<BookDto>>> GetAllAsync()
         {
-            return Ok(await _bookService.GetAllAsync());
+            _logger.LogInformation("HTTP GET /api/books triggered.");
+
+            var books = await _bookService.GetAllAsync();
+
+            _logger.LogInformation("HTTP GET /api/books completed.");
+
+            return Ok(books);
         }
 
         [HttpGet("{id}")]
         public async Task<ActionResult<BookDetailsDto>> GetByIdAsync(int id)
         {
-            return Ok(await _bookService.GetByIdAsync(id));
+            _logger.LogInformation("HTTP GET /api/books/{BookId} triggered.", id);
+
+            var book = await _bookService.GetByIdAsync(id);
+
+            _logger.LogInformation("HTTP GET /api/books/{BookId} completed.", id);
+
+            return Ok(book);
         }
 
         [HttpPost]
@@ -34,10 +49,17 @@ namespace BookstoreApplication.Controllers
         {
             if (!ModelState.IsValid)
             {
+                _logger.LogWarning("Invalid model state in POST /api/books");
                 return BadRequest(ModelState);
             }
 
-            return Ok(await _bookService.CreateAsync(dto));
+            _logger.LogInformation("HTTP POST /api/books triggered.");
+
+            var book = await _bookService.CreateAsync(dto);
+
+            _logger.LogInformation("HTTP POST /api/books completed.");
+
+            return Ok(book);
         }
 
         [HttpPut("{id}")]
@@ -45,16 +67,26 @@ namespace BookstoreApplication.Controllers
         {
             if (!ModelState.IsValid)
             {
+                _logger.LogWarning("Invalid model state in POST /api/books/{BookId}", id);
                 return BadRequest(ModelState);
             }
+            _logger.LogInformation("HTTP PUT /api/books/{BookId} triggered.", id);
 
-            return Ok(await _bookService.UpdateAsync(id, dto));
+            var updated = await _bookService.UpdateAsync(id, dto);
+
+            _logger.LogInformation("HTTP PUT /api/books/{BookId} completed.", id);
+
+            return Ok(updated);
         }
 
         [HttpDelete("{id}")]
         public async Task<ActionResult> DeleteAsync(int id)
         {
+            _logger.LogInformation("HTTP DELETE api/books/{BookId} triggered.", id);
+
             await _bookService.DeleteAsync(id);
+
+            _logger.LogInformation("HTTP DELETE api/books/{BookId} completed.", id);
 
             return NoContent();
         }

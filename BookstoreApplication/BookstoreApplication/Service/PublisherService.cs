@@ -10,11 +10,16 @@ namespace BookstoreApplication.Service
     {
         private readonly IPublisherRepository _publisherRepo;
         private readonly IMapper _mapper;
+        private readonly ILogger<PublisherService> _logger;
 
-        public PublisherService(IPublisherRepository publisherRepo, IMapper mapper)
+        public PublisherService(
+            IPublisherRepository publisherRepo, 
+            IMapper mapper,
+            ILogger<PublisherService> logger)
         {
             _publisherRepo = publisherRepo;
             _mapper = mapper;
+            _logger = logger;
         }
 
         public async Task<IEnumerable<Publisher>> GetAllAsync()

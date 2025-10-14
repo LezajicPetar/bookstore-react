@@ -5,24 +5,24 @@ using BookstoreApplication.Profiles;
 using BookstoreApplication.Repository;
 using BookstoreApplication.Service;
 using Microsoft.EntityFrameworkCore;
+using Serilog;
+using Serilog.Filters;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Dodaj CORS servis
+
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowReactApp",
         policy =>
         {
-            policy.WithOrigins("http://localhost:5173") // adresa gde ti radi React app
+            policy.WithOrigins("http://localhost:5173")
                   .AllowAnyHeader()
                   .AllowAnyMethod();
         });
 });
 
-// Add services to the container.
 builder.Services.AddControllers();
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
@@ -47,6 +47,16 @@ builder.Services.AddAutoMapper(cfg => {
     cfg.AddProfile<PublisherProfile>();
     cfg.AddProfile<AuthorProfile>();
 });
+
+builder.Logging.ClearProviders();
+
+var logger = new LoggerConfiguration()
+    .ReadFrom.Configuration(builder.Configuration)
+    .Enrich.FromLogContext()
+    .Filter.ByIncludingOnly(Matching.FromSource("BookstoreApplication"))
+    .CreateLogger();
+
+builder.Logging.AddSerilog(logger);
 
 var app = builder.Build();
 
