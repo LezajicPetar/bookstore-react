@@ -1,9 +1,10 @@
 ﻿using BookstoreApplication.Models;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
 namespace BookstoreApplication.Data
 {
-    public class LeafDbContext : DbContext
+    public class LeafDbContext : IdentityDbContext<ApplicationUser>
     {
         public LeafDbContext(DbContextOptions<LeafDbContext> options) : base(options) { }
 
@@ -16,6 +17,8 @@ namespace BookstoreApplication.Data
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            base.OnModelCreating(modelBuilder);
+
             modelBuilder.Entity<Author>()
                 .Property(a => a.DateOfBirth)
                 .HasColumnName("Birthday");
