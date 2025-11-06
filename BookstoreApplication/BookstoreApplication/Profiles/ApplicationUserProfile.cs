@@ -9,6 +9,8 @@ namespace BookstoreApplication.Profiles
         public ApplicationUserProfile()
         {
             CreateMap<RegistrationDto, ApplicationUser>();
+
+            CreateMap<ProfileDto, ApplicationUser>().ReverseMap();
         }
     }
 }

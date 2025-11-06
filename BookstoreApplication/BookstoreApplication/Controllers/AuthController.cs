@@ -1,6 +1,7 @@
 ﻿using BookstoreApplication.Dtos;
 using BookstoreApplication.Service;
 using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BookstoreApplication.Controllers
@@ -35,11 +36,19 @@ namespace BookstoreApplication.Controllers
         {
             _logger.LogInformation("HTTP POST api/authorization/login triggered.");
 
-            await _authService.LoginAsync(data);
+            var token = await _authService.LoginAsync(data);
 
             _logger.LogInformation("HTTP POST api/authorization/login completed.");
 
-            return Ok();
+            return Ok(token);
         }
+
+        [Authorize]
+        [HttpGet("profile")]
+        public async Task<IActionResult> Profile()
+        {
+            return Ok(await _authService.GetProfile(User));
+        }
+
     }
 }
