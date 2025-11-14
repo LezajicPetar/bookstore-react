@@ -2,7 +2,7 @@
 using BookstoreApplication.Dtos;
 using BookstoreApplication.Models;
 using BookstoreApplication.Repository;
-using BookstoreApplication.Service;
+using BookstoreApplication.Service.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 

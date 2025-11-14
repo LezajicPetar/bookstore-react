@@ -1,7 +1,7 @@
 ﻿using BookstoreApplication.Dtos.Book;
 using BookstoreApplication.Models;
 
-namespace BookstoreApplication.Service
+namespace BookstoreApplication.Service.Interfaces
 {
     public interface IBookService
     {

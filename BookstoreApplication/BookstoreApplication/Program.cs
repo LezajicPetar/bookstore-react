@@ -1,9 +1,11 @@
 using BookstoreApplication.Data;
 using BookstoreApplication.Middleware;
 using BookstoreApplication.Models;
+using BookstoreApplication.Models.Interfaces;
 using BookstoreApplication.Profiles;
 using BookstoreApplication.Repository;
 using BookstoreApplication.Service;
+using BookstoreApplication.Service.Interfaces;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -69,14 +71,14 @@ builder.Services.AddIdentity<ApplicationUser, IdentityRole>()
 
 builder.Services.Configure<IdentityOptions>(options =>
 {
-    options.Password.RequireDigit = true;          
-    options.Password.RequireUppercase = true;      
+    options.Password.RequireDigit = true;
+    options.Password.RequireUppercase = true;
     options.Password.RequireNonAlphanumeric = true;
     options.Password.RequiredLength = 8;
 });
 
 builder.Services.AddAuthentication(options =>
-{ 
+{
     options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
     options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
 })
@@ -84,18 +86,18 @@ builder.Services.AddAuthentication(options =>
 {
     options.TokenValidationParameters = new TokenValidationParameters
     {
-        ValidateLifetime = true, 
+        ValidateLifetime = true,
 
         ValidateIssuer = true,
         ValidIssuer = builder.Configuration["Jwt:Issuer"],
 
-        ValidateAudience = true, 
-        ValidAudience = builder.Configuration["Jwt:Audience"], 
+        ValidateAudience = true,
+        ValidAudience = builder.Configuration["Jwt:Audience"],
 
-        ValidateIssuerSigningKey = true,  
-        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"])), 
+        ValidateIssuerSigningKey = true,
+        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"])),
 
-        RoleClaimType = ClaimTypes.Role 
+        RoleClaimType = ClaimTypes.Role
     };
 });
 
@@ -108,16 +110,21 @@ builder.Services.AddScoped<IBookService, BookService>();
 builder.Services.AddScoped<IPublisherRepository, PublisherRepository>();
 builder.Services.AddScoped<IPublisherService, PublisherService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
+builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
+builder.Services.AddScoped<IReviewRepository, ReviewRepository>();
+builder.Services.AddScoped<IReviewService, ReviewService>();
 
 builder.Services.AddTransient<ExceptionHandlingMiddleware>();
 
 
-builder.Services.AddAutoMapper(cfg => {
+builder.Services.AddAutoMapper(cfg =>
+{
     cfg.AddProfile<BookProfile>();
     cfg.AddProfile<AwardProfile>();
     cfg.AddProfile<PublisherProfile>();
     cfg.AddProfile<AuthorProfile>();
     cfg.AddProfile<ApplicationUserProfile>();
+    cfg.AddProfile<ReviewProfile>();
 });
 
 builder.Logging.ClearProviders();

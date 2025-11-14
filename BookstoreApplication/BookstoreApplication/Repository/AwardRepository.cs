@@ -1,5 +1,6 @@
 ﻿using BookstoreApplication.Data;
 using BookstoreApplication.Models;
+using BookstoreApplication.Models.Interfaces;
 using Microsoft.EntityFrameworkCore;
 
 namespace BookstoreApplication.Repository
@@ -28,15 +29,12 @@ namespace BookstoreApplication.Repository
         public async Task<Award> CreateAsync(Award award)
         {
             await _context.Awards.AddAsync(award);
-            await _context.SaveChangesAsync();
             return award;
         }
 
         public async Task<Award> UpdateAsync(Award award)
         {
             _context.Awards.Update(award);
-            await _context.SaveChangesAsync();
-
             return award;
         }
 
@@ -47,7 +45,6 @@ namespace BookstoreApplication.Repository
             if (existing == null) return null;
 
             _context.Awards.Remove(existing);
-            await _context.SaveChangesAsync();
 
             return existing;
         }

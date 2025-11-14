@@ -2,7 +2,9 @@
 using BookstoreApplication.Dtos.Book;
 using BookstoreApplication.Exceptions;
 using BookstoreApplication.Models;
+using BookstoreApplication.Models.Interfaces;
 using BookstoreApplication.Repository;
+using BookstoreApplication.Service.Interfaces;
 using Microsoft.AspNetCore.Http.HttpResults;
 using static System.Reflection.Metadata.BlobBuilder;
 
@@ -15,19 +17,25 @@ namespace BookstoreApplication.Service
         private readonly IAuthorRepository _authorRepo;
         private readonly IMapper _mapper;
         private readonly ILogger<BookService> _logger;
+        private readonly IReviewRepository _reviewRepo;
+        private readonly IUnitOfWork _unitOfWork;
 
         public BookService(
-            IBookRepository bRepo, 
-            IPublisherRepository pRepo, 
-            IAuthorRepository aRepo, 
+            IBookRepository bookRepo, 
+            IPublisherRepository publisherRepo, 
+            IAuthorRepository authorRepo, 
+            IReviewRepository reviewRepo,
             IMapper mapper, 
-            ILogger<BookService> logger)
+            ILogger<BookService> logger,
+            IUnitOfWork unitOfWork)
         {
-            _bookRepo = bRepo;
-            _publisherRepo = pRepo;
-            _authorRepo = aRepo;
+            _bookRepo = bookRepo;
+            _publisherRepo = publisherRepo;
+            _authorRepo = authorRepo;
             _mapper = mapper;
             _logger = logger;
+            _unitOfWork = unitOfWork;
+            _reviewRepo = reviewRepo;
         }
 
         public async Task<IEnumerable<BookDto>> GetAllAsync()
@@ -79,7 +87,19 @@ namespace BookstoreApplication.Service
             book.Author = author;
             book.Publisher = publisher;
 
-            var created = await _bookRepo.CreateAsync(book);
+            Book created = null;
+
+            await _unitOfWork.BeginTransactionAsync();
+            try
+            {
+                created = await _bookRepo.CreateAsync(book);
+                await _unitOfWork.CommitAsync();
+            }
+            catch
+            {
+                await _unitOfWork.RollbackAsync();
+                throw;
+            }
 
             _logger.LogInformation("Book created successfully with ID {BookId}", created.Id);
 
@@ -106,7 +126,19 @@ namespace BookstoreApplication.Service
             book.Author = author;
             book.Publisher = publisher;
 
-            var updated = await _bookRepo.UpdateAsync(book);
+            Book updated = null; 
+
+            await _unitOfWork.BeginTransactionAsync();
+            try
+            {
+                updated = await _bookRepo.UpdateAsync(book);
+                await _unitOfWork.CommitAsync();
+            }
+            catch
+            {
+                await _unitOfWork.RollbackAsync();
+                throw;
+            }
 
             _logger.LogInformation("Book with ID {BookId} successfully updated.", id);
 
@@ -117,8 +149,18 @@ namespace BookstoreApplication.Service
         {
             _logger.LogInformation("Attempting to delete book with ID {BookId}", id);
 
-            var deleted = await _bookRepo.DeleteAsync(id)
-                ?? throw new NotFoundException("Book", id);
+            await _unitOfWork.BeginTransactionAsync();
+            try
+            {
+                var deleted = await _bookRepo.DeleteAsync(id)
+                    ?? throw new NotFoundException("Book", id);
+                await _unitOfWork.CommitAsync();
+            }
+            catch
+            {
+                await _unitOfWork.RollbackAsync();
+                throw;
+            }
 
             _logger.LogInformation("Book with ID {BookId} deleted successfully.", id);
         }

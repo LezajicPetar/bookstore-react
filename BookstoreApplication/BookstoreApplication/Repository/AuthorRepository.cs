@@ -1,5 +1,6 @@
 ﻿using BookstoreApplication.Data;
 using BookstoreApplication.Models;
+using BookstoreApplication.Models.Interfaces;
 using Microsoft.EntityFrameworkCore;
 
 namespace BookstoreApplication.Repository
@@ -47,7 +48,6 @@ namespace BookstoreApplication.Repository
             _logger.LogDebug("Inserting new Author into database: {FullName}...", author.FullName);
 
             await _context.Authors.AddAsync(author);
-            await _context.SaveChangesAsync();
 
             _logger.LogDebug("Autor with ID {AuthorId} succesfully inserted.", author.Id);
 
@@ -59,7 +59,6 @@ namespace BookstoreApplication.Repository
             _logger.LogDebug("Updating Author entity in database: ID={AuthorId}...", author.Id);
 
             _context.Authors.Update(author);
-            await _context.SaveChangesAsync();
 
             _logger.LogDebug("Author with ID {AuthorId} successfully updated.", author.Id);
 
@@ -73,7 +72,6 @@ namespace BookstoreApplication.Repository
             if(existing == null) return null;
 
             _context.Authors.Remove(existing);
-            await _context.SaveChangesAsync();
 
             return existing;
         }

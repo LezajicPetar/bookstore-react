@@ -7,6 +7,8 @@
         public int PageCount { get; set; }
         public DateTime PublishedDate { get; set; }
         public string ISBN { get; set; } = string.Empty;
+        public double AverageRating { get; set; } = 0;
+        public ICollection<Review> Reviews { get; set; } = new List<Review>();
 
         public int AuthorId { get; set; }
         public Author? Author { get; set; }

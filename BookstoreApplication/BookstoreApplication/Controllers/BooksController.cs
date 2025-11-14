@@ -2,7 +2,7 @@
 using BookstoreApplication.Dtos.Book;
 using BookstoreApplication.Models;
 using BookstoreApplication.Repository;
-using BookstoreApplication.Service;
+using BookstoreApplication.Service.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BookstoreApplication.Controllers

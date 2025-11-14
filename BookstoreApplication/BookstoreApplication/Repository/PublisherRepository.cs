@@ -1,5 +1,6 @@
 ﻿using BookstoreApplication.Data;
 using BookstoreApplication.Models;
+using BookstoreApplication.Models.Interfaces;
 using Microsoft.EntityFrameworkCore;
 
 namespace BookstoreApplication.Repository
@@ -28,15 +29,12 @@ namespace BookstoreApplication.Repository
         public async Task<Publisher> CreateAsync(Publisher publisher)
         {
             await _context.Publishers.AddAsync(publisher);
-            await _context.SaveChangesAsync();
             return publisher;
         }
 
         public async Task<Publisher> UpdateAsync(Publisher publisher)
         {
             _context.Publishers.Update(publisher);
-            await _context.SaveChangesAsync();
-
             return publisher;
         }
 
@@ -47,7 +45,6 @@ namespace BookstoreApplication.Repository
             if (existing == null) return null;
 
             _context.Publishers.Remove(existing);
-            await _context.SaveChangesAsync();
 
             return existing;
         }

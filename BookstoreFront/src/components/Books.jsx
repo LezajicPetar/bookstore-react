@@ -1,9 +1,12 @@
 import React from "react";
 import { getAllBooks, deleteBook } from '../service/booksService';
 import { useEffect, useState } from 'react';
+import ReviewModal from "./ReviewModal";
 
 const Books = () => {
     const [books, setBooks] = useState([]);
+    const [selectedBook, setSelectedBook] = useState(null);
+
 
     useEffect(() => {
         const fetchBooks = async () => {
@@ -19,7 +22,7 @@ const Books = () => {
         fetchBooks();
     }, [])
 
-    const handleDelete =  async (id) => {
+    const handleDelete = async (id) => {
         try {
             await deleteBook();
             setBooks((prev) => prev.map(book => book.id !== id));
@@ -30,39 +33,42 @@ const Books = () => {
             alert("")
         }
     }
+    
+    return (
+        <div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Title</th>
+                        <th>Author</th>
+                        <th>Published</th>
+                        <th>Pages</th>
+                        <th>Publisher</th>
+                        <th></th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {books.map((book) => (
+                        <tr key={book.id}>
+                            <td>{book.title}</td>
+                            <td>{book.authorFullName}</td>
+                            <td>{book.publishedDate}</td>
+                            <td>{book.pageCount}</td>
+                            <td><button>UPDATE</button></td>
+                            <td><button>DELETE</button></td>
+                            <td><button onClick={()=> setSelectedBook(book)}>REVIEW</button></td>
+                        </tr>
+                    ))}
+                </tbody>
+            </table>
+
+            {selectedBook && (<ReviewModal book={selectedBook} onClose={setSelectedBook}/>)}
+        </div>
+    );
 
 }
 
-return (
-    <div>
-        <table>
-            <thead>
-                <tr>
-                    <th>Title</th>
-                    <th>Author</th>
-                    <th>Published</th>
-                    <th>Pages</th>
-                    <th>Publisher</th>
-                    <th></th>
-                    <th></th>
-                </tr>
-            </thead>
-            <tbody>
-                {books.map((book) => (
-                    <tr key={book.id}>
-                        <td>{book.title}</td>
-                        <td>{book.author.fullName}</td>
-                        <td>{book.publishedDate}</td>
-                        <td>{book.pageCount}</td>
-                        <td>{book.publisher.name}</td>
-                        <td><button>UPDATE</button></td>
-                        <td><button>DELETE</button></td>
-                    </tr>
-                ))}
-            </tbody>
-        </table>
-    </div>
-);
 
 
 export default Books;

@@ -1,4 +1,4 @@
-﻿namespace BookstoreApplication.Models
+﻿namespace BookstoreApplication.Models.Interfaces
 {
     public interface IAwardRepository : IRepository<Award>
     {

@@ -2,6 +2,7 @@
 using BookstoreApplication.Dtos;
 using BookstoreApplication.Exceptions;
 using BookstoreApplication.Models;
+using BookstoreApplication.Service.Interfaces;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
@@ -16,17 +17,20 @@ namespace BookstoreApplication.Service
         private readonly ILogger<AuthService> _logger;
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly IConfiguration _configuration;
+        private IUnitOfWork _unitOfWork;
 
         public AuthService(
             IMapper mapper,
             ILogger<AuthService> logger,
             UserManager<ApplicationUser> userManager,
-            IConfiguration configuration)
+            IConfiguration configuration,
+            IUnitOfWork unitOfWork)
         {
             _mapper = mapper;
             _userManager = userManager;
             _logger = logger;
             _configuration = configuration;
+            _unitOfWork = unitOfWork;
         }
 
         public async Task RegisterAsync(RegistrationDto data)
@@ -62,6 +66,7 @@ namespace BookstoreApplication.Service
             var token = GenerateJwt(user);
             return token;
         }
+
 
         public async Task<ProfileDto> GetProfile(ClaimsPrincipal userPrincipal)
         {

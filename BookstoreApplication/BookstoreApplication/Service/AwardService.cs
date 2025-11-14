@@ -2,7 +2,9 @@
 using BookstoreApplication.Dtos;
 using BookstoreApplication.Exceptions;
 using BookstoreApplication.Models;
+using BookstoreApplication.Models.Interfaces;
 using BookstoreApplication.Repository;
+using BookstoreApplication.Service.Interfaces;
 
 namespace BookstoreApplication.Service
 {
@@ -11,12 +13,18 @@ namespace BookstoreApplication.Service
         private readonly IAwardRepository _awardRepo;
         private readonly IMapper _mapper;
         private readonly ILogger<AwardService> _logger;
+        private IUnitOfWork _unitOfWork;
 
-        public AwardService(IAwardRepository awardRepo, IMapper mapper, ILogger<AwardService> logger)
+        public AwardService(
+            IAwardRepository awardRepo,
+            IMapper mapper, 
+            ILogger<AwardService> logger,
+            IUnitOfWork unitOfWork)
         {
             _awardRepo = awardRepo;
             _mapper = mapper;
             _logger = logger;
+            _unitOfWork = unitOfWork;
         }
 
         public async Task<IEnumerable<Award>> GetAllAsync()
@@ -47,8 +55,19 @@ namespace BookstoreApplication.Service
             _logger.LogInformation("Creating new award: {AwardName}", dto.Name);
 
             var award = _mapper.Map<Award>(dto);
+            Award created = null;
 
-            var created = await _awardRepo.CreateAsync(award);
+            await _unitOfWork.BeginTransactionAsync();
+            try
+            {
+                created = await _awardRepo.CreateAsync(award);
+                await _unitOfWork.CommitAsync();
+            }
+            catch
+            {
+                await _unitOfWork.RollbackAsync();
+                throw;
+            }
 
             _logger.LogInformation("Award created successfully with ID {AwardId}", created.Id);
 
@@ -64,7 +83,19 @@ namespace BookstoreApplication.Service
 
             _mapper.Map(dto, award);
 
-            var updated = await _awardRepo.UpdateAsync(award);
+            Award updated = null;
+
+            await _unitOfWork.BeginTransactionAsync();
+            try
+            {
+                updated = await _awardRepo.UpdateAsync(award);
+                await _unitOfWork.CommitAsync();
+            }
+            catch
+            {
+                await _unitOfWork.RollbackAsync();
+                throw;
+            }
 
             _logger.LogInformation("Award with ID {AwardId} successfully updated.", id);
 
@@ -75,8 +106,18 @@ namespace BookstoreApplication.Service
         {
             _logger.LogInformation("Attempting to delete award with ID {AwardId}", id);
 
-            var deleted = await _awardRepo.DeleteAsync(id)
-                ?? throw new NotFoundException("Award", id);
+            await _unitOfWork.BeginTransactionAsync();
+            try
+            {
+                var deleted = await _awardRepo.DeleteAsync(id)
+                    ?? throw new NotFoundException("Award", id);
+                await _unitOfWork.CommitAsync();
+            }
+            catch
+            {
+                await _unitOfWork.RollbackAsync();
+                throw;
+            }
 
             _logger.LogInformation("Award with ID {AwardId} deleted successfully.", id);
         }

@@ -1,5 +1,6 @@
 ﻿using BookstoreApplication.Data;
 using BookstoreApplication.Models;
+using BookstoreApplication.Models.Interfaces;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.EntityFrameworkCore;
 
@@ -35,15 +36,12 @@ namespace BookstoreApplication.Repository
         public async Task<Book> CreateAsync(Book book)
         {
             await _context.Books.AddAsync(book);
-            await _context.SaveChangesAsync();
             return book;
         }
 
         public async Task<Book> UpdateAsync(Book book)
         {
             _context.Books.Update(book);
-            await _context.SaveChangesAsync();
-
             return book;
         }
 
@@ -54,7 +52,6 @@ namespace BookstoreApplication.Repository
             if (existing == null) return null;
 
             _context.Books.Remove(existing);
-            await _context.SaveChangesAsync();
 
             return existing;
         }

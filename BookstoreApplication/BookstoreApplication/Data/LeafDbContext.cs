@@ -13,11 +13,18 @@ namespace BookstoreApplication.Data
         public DbSet<Publisher> Publishers { get; set; }
         public DbSet<Award> Awards { get; set; }
         public DbSet<AuthorAward> AuthorsAwards { get; set; }
+        public DbSet<Review> Reviews { get; set; }
 
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
+
+            modelBuilder.Entity<Book>()
+                .HasMany(b => b.Reviews)
+                .WithOne()
+                .HasForeignKey(r => r.BookId)
+                .OnDelete(DeleteBehavior.Cascade);
 
             modelBuilder.Entity<Author>()
                 .Property(a => a.DateOfBirth)

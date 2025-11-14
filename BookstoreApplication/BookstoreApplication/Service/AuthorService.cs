@@ -2,7 +2,9 @@
 using BookstoreApplication.Dtos;
 using BookstoreApplication.Exceptions;
 using BookstoreApplication.Models;
+using BookstoreApplication.Models.Interfaces;
 using BookstoreApplication.Repository;
+using BookstoreApplication.Service.Interfaces;
 
 namespace BookstoreApplication.Service
 {
@@ -11,15 +13,18 @@ namespace BookstoreApplication.Service
         private readonly IAuthorRepository _authorRepo;
         private readonly IMapper _mapper;
         private readonly ILogger<AuthorService> _logger;
+        private IUnitOfWork _unitOfWork;
 
         public AuthorService(
             IAuthorRepository authorRepo, 
             IMapper mapper, 
-            ILogger<AuthorService> logger)
+            ILogger<AuthorService> logger,
+            IUnitOfWork unitOfWork)
         {
             _authorRepo = authorRepo;
             _mapper = mapper;
             _logger = logger;
+            _unitOfWork = unitOfWork;
         }
 
         public async Task<IEnumerable<Author>> GetAllAsync()
@@ -50,8 +55,19 @@ namespace BookstoreApplication.Service
             _logger.LogInformation("Creating new author: {FullName}", dto.FullName);
 
             var author = _mapper.Map<Author>(dto);
+            Author created = null;
 
-            var created = await _authorRepo.CreateAsync(author);
+            await _unitOfWork.BeginTransactionAsync();
+            try
+            {
+                created = await _authorRepo.CreateAsync(author);
+                await _unitOfWork.CommitAsync();
+            }
+            catch
+            {
+                await _unitOfWork.RollbackAsync();
+                throw;
+            }
 
             _logger.LogInformation("Author created successfully with ID {AuthorId}", created.Id);
 
@@ -67,7 +83,19 @@ namespace BookstoreApplication.Service
 
             _mapper.Map(dto, author);
 
-            var updated = await _authorRepo.UpdateAsync(author);
+            Author updated = null;
+            await _unitOfWork.BeginTransactionAsync();
+            try
+            {
+                updated = await _authorRepo.UpdateAsync(author);
+                await _unitOfWork.CommitAsync();
+            }
+            catch
+            {
+                await _unitOfWork.RollbackAsync();
+                throw;
+            }
+
 
             _logger.LogInformation("Author with ID {AuthorId} successfully updated.", id);
 
@@ -78,8 +106,18 @@ namespace BookstoreApplication.Service
         {
             _logger.LogInformation("Attempting to delete author with ID {AuthorId}", id);
 
-            var deleted = await _authorRepo.DeleteAsync(id)
-                ?? throw new NotFoundException("Author", id);
+            await _unitOfWork.BeginTransactionAsync();
+            try
+            {
+                var deleted = await _authorRepo.DeleteAsync(id)
+                    ?? throw new NotFoundException("Author", id);
+                await _unitOfWork.CommitAsync();
+            }
+            catch
+            {
+                await _unitOfWork.RollbackAsync();
+                throw;
+            }
 
             _logger.LogInformation("Author with ID {AuthorId} deleted successfully.", id);
         }
